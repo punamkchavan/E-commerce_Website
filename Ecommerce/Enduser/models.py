@@ -12,3 +12,23 @@ class Shopee(models.Model):
     
     def __str__(self):
         return f"{self.user.username} - {self.text[:10]}"
+    
+    
+class Product(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField()
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    image = models.ImageField(upload_to='products/')
+
+    def __str__(self):
+        return self.name
+    
+class First(models.Model):
+    username=models.CharField(max_length=250)
+    password1=models.CharField(max_length=250)
+    
+    
+    def __str__(self):
+        return self.username
+    
+
