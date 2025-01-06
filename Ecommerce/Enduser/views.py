@@ -1,31 +1,55 @@
-from django.shortcuts import render
-from .models import Shopee
-from .forms import ShopeeForm, UserRegistrationForm
-from django.shortcuts import get_object_or_404
-from django.shortcuts import redirect
+from django.shortcuts import render, redirect
+from .forms import UserRegistrationForm
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import login
+from django.contrib.auth import login,logout,authenticate
+from django.contrib import messages
 
 # Create your views here.
 
-def index(req):
-    return render(req,'index.html')
+def user_dashboard(request):
+    return render(request, 'user_dashboard.html')
 
-def register(req):
-    if req.method =='POST':
-        form=UserRegistrationForm(req.POST)
+#Registration_view
+def register(request):
+    if request.method == 'POST':
+        form = UserRegistrationForm(request.POST)   
         if form.is_valid():
-            user=form.save(commot=False)
-            user.set_password(form.changed_data['password1'])
-            user.save()
-            login(req,user)
-            return redirect('tweet_list')
+            user = form.save()  
+            login(request, user)   
+            messages.success(request, "Registration successful.")
+            return redirect('login') 
+        else:
+            messages.error(request, "Unsuccessful registration. Invalid information.")
     else:
-        form=UserRegistrationForm()
-        
-    return render(req,'registration/register.html',{'form':form})
+        form = UserRegistrationForm()  
+    return render(request, 'register.html', {'form': form})
+
+# Login_view
+def login_view(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('register')   
+            else:
+                messages.error(request, "Invalid username or password.")
+        else:
+            messages.error(request, "Invalid username or password.")
+    else:
+        form = AuthenticationForm()
+    return render(request, 'login.html', {'form': form})
+
+# Logout_view
+@login_required
+def logout_view(request):
+    logout(request)
+    messages.success(request, "You have successfully logged out.")
+    return redirect('login')
     
     
 
-    
-    
