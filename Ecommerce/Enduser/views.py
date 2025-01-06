@@ -11,7 +11,7 @@ def user_dashboard(request):
     return render(request, 'user_dashboard.html')
 
 #Registration_view
-def register(request):
+def register_view(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)   
         if form.is_valid():

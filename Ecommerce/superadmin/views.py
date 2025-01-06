@@ -39,6 +39,7 @@ def admin_dashboard(request):
     return render(request, 'admin_dashboard.html', {'username': request.session.get('username')})
 
 #Admin_Logout
+@login_required
 def logout_view(request):
     request.session.flush()
     return redirect('/admin_login')
