@@ -7,6 +7,11 @@ from django.contrib import messages
 
 # Create your views here.
 
+#home_view
+def home_view(request):
+    return render(request, 'home.html')
+
+#user_dashboard
 def user_dashboard(request):
     return render(request, 'user_dashboard.html')
 
@@ -35,7 +40,7 @@ def login_view(request):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('register')   
+                return redirect('user_dashboard')   
             else:
                 messages.error(request, "Invalid username or password.")
         else:
