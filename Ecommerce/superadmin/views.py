@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Host
 from django.contrib.auth.hashers import make_password,check_password
+from .models import Product, Order
 
 
 # hashed_password = make_password('')
@@ -21,7 +22,7 @@ def admin_login(request):
                 
                 request.session['is_logged_in'] = True
                 request.session['username'] = username
-                return redirect('/userdashboard') 
+                return redirect('/admin_dashboard') 
             else:
                 messages.error(request, "Invalid username or password")
                 return redirect('/admin_login')
@@ -32,15 +33,16 @@ def admin_login(request):
 
     return render(request, 'admin_login.html')
 
-#Admin_dashboard
-def admin_dashboard(request):
-    if not request.session.get('is_logged_in'):
-        return redirect('/admin_login')  
-    return render(request, 'admin_dashboard.html', {'username': request.session.get('username')})
-
-#Admin_Logout
 @login_required
-def logout_view(request):
-    request.session.flush()
-    return redirect('/admin_login')
-    
+def admin_dashboard(request):
+    total_products = Product.objects.count()
+    total_orders = Order.objects.count()
+    return render(request, 'admin_dashboard.html', {
+        'total_products': total_products,
+        'total_orders': total_orders,
+    })
+
+@login_required
+def product_list(request):
+    products = Product.objects.all()
+    return render(request, 'product_list.html', {'products': products})

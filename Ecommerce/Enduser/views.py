@@ -4,7 +4,8 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login,logout,authenticate
 from django.contrib import messages
-
+from superadmin.models import Product
+from .models import Cart
 # Create your views here.
 
 #home_view
@@ -56,5 +57,21 @@ def logout_view(request):
     messages.success(request, "You have successfully logged out.")
     return redirect('login')
     
-    
+def product_list(request):
+    products = Product.objects.all()
+    return render(request, 'end_user/product_list.html', {'products': products})
 
+def add_to_cart(request, product_id):
+    product = Product.objects.get(id=product_id)
+    session_id = request.session.session_key
+    if not session_id:
+        request.session.create()
+        session_id = request.session.session_key
+
+    Cart.objects.create(session_id=session_id, product=product, quantity=1)
+    return redirect('cart')
+
+def cart_view(request):
+    session_id = request.session.session_key
+    cart_items = Cart.objects.filter(session_id=session_id)
+    return render(request, 'end_user/cart.html', {'cart_items': cart_items})

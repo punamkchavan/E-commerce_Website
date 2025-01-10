@@ -24,13 +24,18 @@ from Enduser import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',views.home_view,name='home'),
-    path('admin_dashboard', views.user_dashboard, name='admin_dashboard'),
+    path('home/',views.home_view,name='home'),
+    
     path('admin_login/', views.login_view, name='admin_login'),
     path('logout/', views.logout_view, name='logout'),
     path('register/',views.register_view,name='register'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('user_dashboard/', views.user_dashboard, name='user_dashboard'),
+    #path('admin_dashboard', views.admin_dashboard, name='admin_dashboard'),
+    path('products/', views.product_list, name='product_list'),
+    path('', views.product_list, name='product_list'),
+    path('cart/', views.cart_view, name='cart'),
+    path('add-to-cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
        
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
