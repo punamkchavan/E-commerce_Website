@@ -31,6 +31,23 @@ ALLOWED_HOSTS =os.getenv('ALLOWED_HOSTS', '').split(',')
 
 
 
+# REST Framework Configuration
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+# SimpleJWT Settings 
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -42,6 +59,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'superadmin',
     'Enduser',
+    'rest_framework',
+    'rest_framework_simplejwt',
 ]
 
 MIDDLEWARE = [
@@ -52,6 +71,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'superadmin.middleware.AdminOnlyMiddleware',
 ]
 
 ROOT_URLCONF = 'Ecommerce.urls'
@@ -135,6 +155,6 @@ MEDIA_URL = 'media/'
 MEDIA_ROOT= os.path.join(BASE_DIR, 'media')
 
  
-LOGOUT_REDIRECT_URL = '/Enduser/login/'
+ 
 
  
