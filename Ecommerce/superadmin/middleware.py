@@ -1,35 +1,51 @@
-from django.http import JsonResponse
-from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework.exceptions import AuthenticationFailed
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from .models import UserData
+import jwt
+from django.conf import settings
 
-class AdminOnlyMiddleware:
+class AuthenticateUserMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
-         
-        if request.path.startswith('/admin_login/'):
-            try:
-                
-                jwt_auth = JWTAuthentication()
-                auth_result = jwt_auth.authenticate(request)
+        excluded_urls = [
+            'register/', 'login/', 'check-login',
+             '/',
+        ]
+        print(request.path_info)
+        if request.path_info in excluded_urls:
+            return self.get_response(request)
 
-                if auth_result is None:
- 
-                    raise AuthenticationFailed('Invalid or missing token')
+        auth_header = request.headers.get('Authorization')
+        print("auth_header",auth_header)
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return HttpResponseRedirect(reverse('dashboard'))
 
-                user, token = auth_result
+        token = auth_header.split(' ')[1]
+        print("token",token)
 
-                
-                if not user.is_staff:
-                    return JsonResponse({'detail': 'Unauthorized: Admin access only'}, status=403)
+        try:
+            decoded_token = jwt.decode(token,'8jR2sWnC4xQzHtUyL6vPbM9aZ3gD7eF1sK0oL7jX8wO9tR0hY5sF1iE3oQ1cK6gW2hS4aJ5bP9eV0jU4iO2qD6rH3lN9mS7tP1rY2gT8bA1uO3zR',algorithms=['HS256'], options={"verify_signature": False})
+            print("decode",decoded_token)
+            user_id = decoded_token.get('user_id')
+            print("userId",user_id)
 
-                 
-                request.user = user
+            if not user_id:
+                return HttpResponseRedirect(reverse('dashboard'))
 
-            except AuthenticationFailed as e:
-                return JsonResponse({'detail': str(e)}, status=401)
+            user_obj = UserData.objects.get(id=user_id)
+            print("user_obj",user_obj)
+            request.user = user_obj  # Attach the user object to the request
 
-        
-        response = self.get_response(request)
-        return response
+        except jwt.ExpiredSignatureError:
+            print("ExpiredSignatureError")
+            return HttpResponseRedirect(reverse('dashboard'))
+        except jwt.InvalidTokenError:
+            print("InvalidTokenError")
+            return HttpResponseRedirect(reverse('dashboard'))
+        except UserData.DoesNotExist:
+            print("UserData.DoesNotExist")
+            return HttpResponseRedirect(reverse('dashboard'))
+
+        return self.get_response(request)
