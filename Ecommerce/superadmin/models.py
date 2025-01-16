@@ -8,4 +8,4 @@ class UserData(models.Model):
     phone_no = models.PositiveIntegerField(unique=True)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=255)
-     
+    
