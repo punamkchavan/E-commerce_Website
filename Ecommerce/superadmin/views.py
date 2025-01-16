@@ -4,6 +4,7 @@ import bcrypt
 import jwt
 from .models import UserData
 from datetime import datetime
+from django.views.decorators.csrf import csrf_exempt
 
 
 #Dashboard_view
@@ -15,7 +16,7 @@ def get_registration_page(request):
 def get_login_page(request):
     return render(request, 'login.html')
 
- 
+@csrf_exempt
 def post_registration_data(request):
     if request.method == 'POST':
         body = request.POST
@@ -39,7 +40,7 @@ def post_registration_data(request):
     else:
         return JsonResponse({'message': 'Method Not Allowed'}, status=405)
 
- 
+@csrf_exempt
 def check_login(request):
     if request.method == 'POST':
         body = request.POST
@@ -67,3 +68,6 @@ def check_login(request):
     else:
         return JsonResponse({'message': 'Method Not Allowed'}, status=405)
     
+@csrf_exempt
+def get_expense_main_home_page(request):
+    return render(request, 'mainHome.html')

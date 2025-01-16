@@ -17,9 +17,9 @@ if (btnSubmit) {
                 }
             });
             if (result.data.message === 'success') {
-                await displayNotification('Login Successful', 'success', divAlert);
                 const token = result.data.token;
                 localStorage.setItem('token', token);
+                await displayNotification('Login Successful', 'success', divAlert);
                 window.location.href = '/expense/MainHome';
             }
         } catch (error) {
